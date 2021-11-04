@@ -1,2 +1,2 @@
 # Newsfeed
-RSS Feed Parser for news headlines.
+Flask RSS Feed Parser with the appropriate structure to deploy to Heroku.
