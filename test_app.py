@@ -1,8 +1,12 @@
 import pytest
 import feedparser
 import re
+from flask import Flask
 from app import helloroc, news, rss 
 
+app = Flask(__name__)
+
+app.testing = True
 #Sample RSS Feed below to test
 rss_to_test = """<?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:npr="https://www.npr.org/rss/" xmlns:nprml="https://api.npr.org/nprml" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/" version="2.0">
@@ -190,3 +194,43 @@ def test_re1():
 #Test function to test regular expressions removing the </em> tag
 def test_re2():
     assert b_em_removed2 == b2
+
+def test_news_status_code():
+    with app.app_context():
+        news_response_status_code = news().status_code
+        assert news_response_status_code == 200
+
+def test_news_status():
+    with app.app_context():
+        news_status = news().status
+        assert news_status == "200 OK"
+
+def test_news_content_type():
+    with app.app_context():
+        news_content_type = news().content_type
+        assert news_content_type == "application/json"
+
+def test_news_mimetype():
+    with app.app_context():
+        news_mimetype = news().mimetype
+        assert news_mimetype == "application/json"
+
+def test_content_length():
+    with app.app_context():
+        news_content_length = news().calculate_content_length()
+        assert news_content_length > 1000
+
+def test_headers():
+    with app.app_context():
+        news_headers = str(news().headers)
+        assert "Content-Type: application/json" in news_headers
+
+def test_rss_response_doctype():
+    with app.app_context():
+        rss_response_doctype = rss()
+        assert "<!doctype html>" in rss_response_doctype
+
+def test_rss_response_title():
+    with app.app_context():
+        rss_response_title = rss()
+        assert "<title>NPR News Headlines</title>" in rss_response_title
