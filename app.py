@@ -5,7 +5,7 @@ import re #Python Regular Expression Library
 
 app = Flask(__name__)
 
-#Parse NPR RSS Feed data using feedparser and f strings. Use regular expression to
+#Parse NPR RSS Feed data using the feedparser library. Use regular expression to
 #remove <em> and </em> tags that the feedparser library is unable to remove.
 #For example below b is the story title and story summary from the RSS feed.
 #b1 equals the story title and story summary with any <em> tags removed.
