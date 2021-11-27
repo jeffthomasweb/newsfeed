@@ -255,3 +255,4 @@ class TestRss(unittest.TestCase)
             self.assertIn("<title>RSS Feed News Headlines</title>", home_response_title)
 
 if __name__ == "__main__":
+    unitest.main()
