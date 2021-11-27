@@ -179,7 +179,7 @@ b_em_removed1 = re.sub('<em>', '',b)
 #Use regular expressions to remove the </em> tag from string b_em_removed1
 b_em_removed2 = re.sub('</em>', '',b_em_removed1)
 
-class TestRss(unittest.TestCase)
+class TestRss(unittest.TestCase):
     #Test feedparser library on sample RSS feed string                     
     def test_feedparser(self):
         a = feedparser.parse(rss_to_test)
