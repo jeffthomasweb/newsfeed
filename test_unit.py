@@ -198,7 +198,13 @@ class TestRss(unittest.TestCase)
     def test_rss(self):
         with app.app_context():
             rss_parse_test = rss(rss_to_test)
-            self.assertEqual(len(rss_parse_test), 15)   
+            self.assertEqual(len(rss_parse_test), 15)
+    
+    #Test the rss() function parses the NPR feed and returns a list with a length of 15
+    def test_rss_function_return(self):
+        with app.app_context():
+            rss_function_return = rss("https://feeds.npr.org/1001/rss.xml")
+            self.assertEqual(len(rss_function_return), 15)
     
     #Test news() function produces response code 200 when going to website route /news 
     def test_news_status_code(self):
