@@ -42,9 +42,15 @@ ars_list = rss("https://feeds.arstechnica.com/arstechnica/index")
 #Use function for local Buffalo news station feed
 buffalo_list = rss("https://www.wgrz.com/feeds/syndication/rss/news/local")
 
-#Create the main website route. Anyone visiting the main site will see a JSON version of the RSS data.
+#Visiting the main site URL will show the stories as a normal HTML site.
 @app.route("/")
 def home():
+    return render_template("index.html", npr_list=npr_list, ars_list=ars_list, buffalo_list=buffalo_list)
+
+#Create a /news route. Anyone visiting the website with a url ending in /news will 
+#see a JSON version of the RSS data.
+@app.route("/news")
+def news():
     return jsonify(npr_list,ars_list,buffalo_list)
 
 if __name__ == '__main__':
