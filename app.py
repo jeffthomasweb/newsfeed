@@ -5,94 +5,47 @@ import re #Python Regular Expression Library
 
 app = Flask(__name__)
 
-#Parse NPR RSS Feed data using the feedparser library. Use regular expression to
-#remove <em> and </em> tags that the feedparser library is unable to remove.
-#For example below b is the story title and story summary from the RSS feed.
-#b1 equals the story title and story summary with any <em> tags removed.
-#b2 equals the story title and story summary with any </em> tags removed.
+#Write a general function to get RSS Data and use the function later in this file under @app.route("/")
+#General function is named def rss(rss_address) 
+#Gets RSS data using the function parameter rss_address
 
-a = feedparser.parse("https://feeds.npr.org/1001/rss.xml")
+def rss(rss_address):
+    #Use feedparser to get the RSS feed data and parse the story titles and summaries
+    feedparser_parse = feedparser.parse(f"{rss_address}")
+    #Create an empty list to add RSS feed story titles and summaries
+    story_list = []
+    #feedparser is a great library but it doesn't parse some html tags like <em> and </em>
+    #Create an empty list clean_story_list1 to add RSS feed data cleaned of <em> tags 
+    clean_story_list1 = []
+    #Create an empty list clean_story_list2 to add RSS feed data cleaned of </em> tags
+    clean_story_list2 = []
+    #Append 15 story titles and summaries to story_list
+    for i in range(0,15):
+        story_list.append(feedparser_parse.entries[i].title + '. ' + feedparser_parse.entries[i].summary)
+    
+    #Clean items in story_list of <em> tags and append to clean_story_list1
+    for cleantag in story_list:
+        clean_story_list1.append(re.sub('<em>', '', cleantag))
 
-b = a.entries[0].title + '. ' + a.entries[0].summary
-b1 = re.sub('<em>', '',b)
-b2 = re.sub('</em>', '',b1)
+    #Clean items in story_list1 of </em> tags and append to clean_story_list2
+    for cleantag2 in clean_story_list1:
+        clean_story_list2.append(re.sub('</em>', '', cleantag2))
+    
+    return clean_story_list2
 
-c = a.entries[1].title + '. ' + a.entries[1].summary
-c1 = re.sub('<em>', '',c)
-c2 = re.sub('</em>', '',c1)
+#Use function for NPR RSS feed and save as npr_list
+npr_list = rss("https://feeds.npr.org/1001/rss.xml")
 
-d = a.entries[2].title + '. ' + a.entries[2].summary
-d1 = re.sub('<em>', '',d)
-d2 = re.sub('</em>', '',d1)
+#Use function for Ars Technica feed
+ars_list = rss("https://feeds.arstechnica.com/arstechnica/index")
 
-e = a.entries[3].title + '. ' + a.entries[3].summary
-e1 = re.sub('<em>', '',e)
-e2 = re.sub('</em>', '',e1)
+#Use function for local Buffalo news station feed
+buffalo_list = rss("https://www.wgrz.com/feeds/syndication/rss/news/local")
 
-f = a.entries[4].title + '. ' + a.entries[4].summary
-f1 = re.sub('<em>', '',f)
-f2 = re.sub('</em>', '',f1)
-
-g = a.entries[5].title + '. ' + a.entries[5].summary
-g1 = re.sub('<em>', '',g)
-g2 = re.sub('</em>', '',g1)
-
-h = a.entries[6].title + '. ' + a.entries[6].summary
-h1 = re.sub('<em>', '',h)
-h2 = re.sub('</em>', '',h1)
-
-i = a.entries[7].title + '. ' + a.entries[7].summary
-i1 = re.sub('<em>', '',i)
-i2 = re.sub('</em>', '',i1)
-
-j = a.entries[8].title + '. ' + a.entries[8].summary
-j1 = re.sub('<em>', '',j)
-j2 = re.sub('</em>', '',j1)
-
-k = a.entries[9].title + '. ' + a.entries[9].summary
-k1 = re.sub('<em>', '',k)
-k2 = re.sub('</em>', '',k1)
-
-l = a.entries[10].title + '. ' + a.entries[10].summary
-l1 = re.sub('<em>', '',l)
-l2 = re.sub('</em>', '',l1)
-
-m = a.entries[11].title + '. ' + a.entries[11].summary
-m1 = re.sub('<em>', '',m)
-m2 = re.sub('</em>', '',m1)
-
-n = a.entries[12].title + '. ' + a.entries[12].summary
-n1 = re.sub('<em>', '',n)
-n2 = re.sub('</em>', '',n1)
-
-o = a.entries[13].title + '. ' + a.entries[13].summary
-o1 = re.sub('<em>', '',o)
-o2 = re.sub('</em>', '',o1)
-
-p = a.entries[14].title + '. ' + a.entries[14].summary
-p1 = re.sub('<em>', '',p)
-p2 = re.sub('</em>', '',p1)
-
-#A list of the all the parsed stories from the RSS feed.
-storieslist= [b2,c2,d2,e2,f2,g2,h2,i2,j2,k2,l2,m2,n2,o2,p2]
-
-
-#Anyone that visits our site with the URL ending in /hi will see an HTTP response of Hello RocPy with emojis.
-@app.route("/hi")
-def helloroc():
-    return "Hello RocPy 🪨🐍!"
-
-#A very basic API at the /news URL of the parsed stories from the RSS feed. Use jsonify to have the
-#result as JSON instead of text/html.
-@app.route("/news")
-def news():
-    return jsonify(storieslist)
-
-#Visiting the main site URL will show the stories as a normal HTML site.
+#Create the main website route. Anyone visiting the main site will see a JSON version of the RSS data.
 @app.route("/")
-def rss():
-    return render_template("index.html", storieslist=storieslist)
+def home():
+    return jsonify(npr_list,ars_list,buffalo_list)
 
-#It's a good practice to include following.
 if __name__ == '__main__':
     app.run()
