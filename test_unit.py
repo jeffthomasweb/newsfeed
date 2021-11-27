@@ -1,9 +1,10 @@
-#Test file using Python's unittest library.
+#Test file using Python's unittest library
+
 import unittest
 import feedparser
 import re
 from flask import Flask
-from app import helloroc, news, rss 
+from app import home, news, rss 
 
 app = Flask(__name__)
 
@@ -178,32 +179,28 @@ b_em_removed1 = re.sub('<em>', '',b)
 #Use regular expressions to remove the </em> tag from string b_em_removed1
 b_em_removed2 = re.sub('</em>', '',b_em_removed1)
 
-#Use Python unittest library for tests
-class TestRss(unittest.TestCase):
-    #Sample test just to see if tests are working
-    def test_upper(self):
-        self.assertEqual("foo".upper(),"FOO")
-
-    #Test feedparser library sample RSS feed
+class TestRss(unittest.TestCase)
+    #Test feedparser library on sample RSS feed string                     
     def test_feedparser(self):
         a = feedparser.parse(rss_to_test)
         story_15_parsed = f"{a.entries[14].title + '. ' + a.entries[14].summary}"
         self.assertEqual(story_15_parsed,"President Biden pardons turkeys, Peanut Butter and Jelly, ahead of Thanksgiving. In President Biden's first turkey pardon, he spared two turkeys from the Thanksgiving dinner table. The turkeys' names — Peanut Butter and Jelly — were from a list submitted by schoolchildren.")
-    
-    #Test helloroc() function produces hello world message
-    def test_helloroc(self):
-        helloroc_result = helloroc()
-        self.assertEqual(helloroc_result, "Hello RocPy 🪨🐍!")
-    
-    #Test regular expression removal of <em>
-    def test_re1(self):
+
+    #Test <em> tag removed                     
+    def test_remove1(self):
         self.assertEqual(b_em_removed1, b1)
 
-    #Test function to test regular expressions removing the </em> tag
-    def test_re2(self):
+    #Test </em> tag removed
+    def test_remove2(self):
         self.assertEqual(b_em_removed2, b2)
-
-    #Test news() function produces response code 200 when going to website route /news    
+    
+    #Test rss() function parses sample string and produces a list with a length of 15                     
+    def test_rss(self):
+        with app.app_context():
+            rss_parse_test = rss(rss_to_test)
+            self.assertEqual(len(rss_parse_test), 15)   
+    
+    #Test news() function produces response code 200 when going to website route /news 
     def test_news_status_code(self):
         with app.app_context():
             news_response_status_code = news().status_code
@@ -214,8 +211,8 @@ class TestRss(unittest.TestCase):
         with app.app_context():
             news_status = news().status
             self.assertEqual(news_status, "200 OK")
-            
-    #Test content type at /news is application/json
+    
+    #Test content type at /news is application/json                         
     def test_news_content_type(self):
         with app.app_context():
             news_content_type = news().content_type
@@ -226,8 +223,8 @@ class TestRss(unittest.TestCase):
         with app.app_context():
             news_mimetype = news().mimetype
             self.assertEqual(news_mimetype, "application/json")
-            
-    #Test the content length of the /news route is a reasonable length        
+    
+    #Test the content length of the /news route is a reasonable length
     def test_content_length(self):
         with app.app_context():
             news_content_length = news().calculate_content_length()
@@ -239,17 +236,16 @@ class TestRss(unittest.TestCase):
             news_headers = str(news().headers)
             self.assertIn("Content-Type: application/json", news_headers)
             
-    #Test that the base "/" url for the website has html content      
-    def test_rss_response_doctype(self):
+    #Test that the base "/" url for the website has html content  
+    def test_home_response_doctype(self):
         with app.app_context():
-            rss_response_doctype = rss()
-            self.assertIn("<!doctype html>", rss_response_doctype)
+            home_response_doctype = home()
+            self.assertIn("<!doctype html>", home_response_doctype)
     
-    #Test that Flask render_template produced the <title> tag  
+    #Test that Flask render_template produced the <title> tag 
     def test_rss_response_title(self):
         with app.app_context():
-            rss_response_title = rss()
-            self.assertIn("<title>NPR News Headlines</title>", rss_response_title)
+            home_response_title = home()
+            self.assertIn("<title>RSS Feed News Headlines</title>", home_response_title)
 
 if __name__ == "__main__":
-    unitest.main()
